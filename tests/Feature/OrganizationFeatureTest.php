@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Locale;
+use App\Models\LocaleOrganization;
 use App\Models\Organization;
+use App\Models\OrganizationUser;
 
 class OrganizationFeatureTest extends TestCase
 {
@@ -80,6 +82,74 @@ class OrganizationFeatureTest extends TestCase
 		$this->assertTrue($response['success']);
 
 		$this->assertDatabaseHas('organization_user', ['organizationId' => $organizationId, 'userId' => $userId]);
+
+	}
+
+	public function test_user_can_be_removed_from_organization() {
+
+		$userId = User::factory()->create()->id;
+		$organizationId = Organization::factory()->create()->id;
+
+		OrganizationUser::factory()->create(['organizationId' => $organizationId, 'userId' => $userId]);
+
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations/user/delete', ['organizationId' => $organizationId, 'userId' => $userId]);
+
+		$response->assertStatus(200);
+
+		$this->assertTrue($response['success']);
+
+		$this->assertDatabaseMissing('organization_user', ['organizationId' => $organizationId, 'userId' => $userId]);
+
+	}
+
+	public function test_user_can_not_be_removed_from_organization() {
+
+		$userId = User::factory()->create()->id;
+		$organizationId = Organization::factory()->create()->id;
+
+		OrganizationUser::factory()->create(['organizationId' => $organizationId, 'userId' => $userId]);
+
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations/user/delete', ['organizationId' => '1231321312', 'userId' => '21312312']);
+
+		$response->assertStatus(500);
+
+		$this->assertFalse($response['success']);
+
+		$this->assertDatabaseHas('organization_user', ['organizationId' => $organizationId, 'userId' => $userId]);
+
+	}
+
+	public function test_user_can_remove_locale_from_organization() {
+
+		$localeId = Locale::factory()->create()->id;
+		$organizationId = Organization::factory()->create()->id;
+
+		LocaleOrganization::factory()->create(['organizationId' => $organizationId, 'localeId' => $localeId]);
+
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations/locale/delete', ['organizationId' => $organizationId, 'localeId' => $localeId]);
+
+		$response->assertStatus(200);
+
+		$this->assertTrue($response['success']);
+
+		$this->assertDatabaseMissing('locale_organization', ['organizationId' => $organizationId, 'localeId' => $localeId]);
+
+	}
+
+	public function test_user_can_not_remove_locale_from_organization_with_wrong_input() {
+
+		$localeId = Locale::factory()->create()->id;
+		$organizationId = Organization::factory()->create()->id;
+
+		LocaleOrganization::factory()->create(['organizationId' => $organizationId, 'localeId' => $localeId]);
+
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations/locale/delete', ['organizationId' => '123213', 'localeId' => '12312321']);
+
+		$response->assertStatus(500);
+
+		$this->assertFalse($response['success']);
+
+		$this->assertDatabaseHas('locale_organization', ['organizationId' => $organizationId, 'localeId' => $localeId]);
 
 	}
 

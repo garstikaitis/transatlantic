@@ -51,7 +51,67 @@ class TranslationController extends Controller
 
         } catch (Exception $e) {
 
-            // dd($e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+
+    }
+
+    public function updateTranslation() {
+
+        try {
+            
+            $this->validateInput(
+                request()->all(), [
+                    'translationId' => 'integer|required|exists:translations,id',
+                    'transKey' => 'string|required',
+                    'transValue' => 'string|required',
+                    'localeId' => 'integer|required|exists:locales,id',
+                    'organizationId' => 'integer|required|exists:organizations,id',
+                    'userId' => 'required|exists:users,id'
+                ]
+            );
+
+            if(!$this->checkIfLocaleIsEnabledForOrganization(request('localeId'), request('organizationId'))) {
+
+                abort(500, 'Locale is disabled for organization');
+                
+            }
+
+            $translation = Translation::findOrFail(request('translationId'));
+
+            $request = request()->all();
+            $request['id'] = request('translationId');
+            unset($request['translationId']);
+
+            $translation->updateOrCreate($request);
+
+            return response()->json(['success' => true, 'data' => $translation], 200);
+
+        } catch (Exception $e) {
+
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+
+    }
+
+    public function deleteTranslation() {
+
+        try {
+            
+            $this->validateInput(
+                request()->all(), [
+                    'translationId' => 'integer|required|exists:translations,id',
+                ]
+            );
+
+            $translation = Translation::findOrFail(request('translationId'));
+
+            $translation = $translation->delete();
+
+            return response()->json(['success' => true, 'data' => $translation], 200);
+
+        } catch (Exception $e) {
+
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 

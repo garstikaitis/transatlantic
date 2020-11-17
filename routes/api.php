@@ -36,10 +36,14 @@ Route::group(['middleware' => 'api'], function() {
         Route::get('/{id}', [OrganizationController::class, 'getOrganizationById']);
         Route::post('/', [OrganizationController::class, 'createOrganization']);
         Route::post('/user', [OrganizationController::class, 'addUserToOrganization']);
+        Route::post('/user/delete', [OrganizationController::class, 'removeUserFromOrganization']);
         Route::post('/locale', [OrganizationController::class, 'addLocaleToOrganization']);
+        Route::post('/locale/delete', [OrganizationController::class, 'removeLocaleFromOrganization']);
     });
     Route::group(['prefix' => 'translations'], function() {
         Route::post('/', [TranslationController::class, 'getTranslations']);
         Route::post('/create', [TranslationController::class, 'createTranslation']);
+        Route::post('/update', [TranslationController::class, 'updateTranslation']);
+        Route::post('/delete', [TranslationController::class, 'deleteTranslation']);
     });
 });

@@ -73,6 +73,31 @@ class OrganizationController extends Controller
 
     }
 
+    public function removeUserFromOrganization() {
+
+         try {
+
+            $this->validateInput(
+                request()->all(), [
+                    'userId' => 'integer|required|exists:users,id',
+                    'organizationId' => 'integer|required|exists:organizations,id'
+                ]
+            );
+
+            $map = OrganizationUser::where('userId', request('userId'))->where('organizationId', request('organizationId'))->firstOrFail();
+
+            $map->delete();
+
+            return response()->json(['success' => true, 'data' => []], 200);
+
+        } catch (Exception $e) {
+
+            return response()->json(['success' => false, 'message' => 'Error removing user from organization'], 500);
+
+        }
+
+    }
+
     public function addLocaleToOrganization() {
 
         try {
@@ -92,6 +117,32 @@ class OrganizationController extends Controller
         } catch (Exception $e) {
 
             return response()->json(['success' => false, 'message' => 'Error adding locale to organization'], 500);
+
+        }
+
+    }
+
+    public function removeLocaleFromOrganization() {
+
+        try {
+
+            $this->validateInput(
+                request()->all(), 
+                [
+                    'localeId' => 'integer|required|exists:locales,id',
+                    'organizationId' => 'integer|required|exists:organizations,id'
+                ]
+            );
+
+            $map = LocaleOrganization::where('organizationId', request('organizationId'))->where('localeId', request('localeId'));
+
+            $map->delete();
+
+            return response()->json(['success' => true, 'data' => []], 200);
+
+        } catch (Exception $e) {
+
+            return response()->json(['success' => false, 'message' => 'Error removing locale from organization'], 500);
 
         }
 
