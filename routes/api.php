@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,10 +20,7 @@ use App\Http\Controllers\OrganizationController;
 */
 
 Route::post('login', [AuthController::class, 'login']);
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('register', [RegisterController::class, 'register']);
 
 Route::group(['middleware' => 'api'], function() {
     Route::group(['prefix' => 'auth'], function() {
