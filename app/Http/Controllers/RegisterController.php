@@ -33,7 +33,7 @@ class RegisterController extends Controller
 			
 			$token = auth()->login($user);
     
-            return $authController->respondWithToken($token);
+            return $authController->respondWithToken($token, $user);
 
         } catch(Exception $e) {
 

@@ -1,12 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,9 @@ Route::group(['middleware' => 'api'], function() {
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::post('me', [AuthController::class, 'me']);
     });
+    Route::group(['prefix' => 'users'], function() {
+        Route::post('update', [UserController::class, 'updateUser']);
+    });
     Route::group(['prefix' => 'locales'], function() {
         Route::get('/', [LocaleController::class, 'getAllLocales']);
     });
@@ -45,5 +49,10 @@ Route::group(['middleware' => 'api'], function() {
         Route::post('/create', [TranslationController::class, 'createTranslation']);
         Route::post('/update', [TranslationController::class, 'updateTranslation']);
         Route::post('/delete', [TranslationController::class, 'deleteTranslation']);
+    });
+    Route::group(['prefix' => 'projects'], function() {
+        Route::post('/', [ProjectController::class, 'getProjects']);
+        Route::post('/create', [ProjectController::class, 'createProject']);
+        Route::post('/delete', [ProjectController::class, 'deleteProject']);
     });
 });

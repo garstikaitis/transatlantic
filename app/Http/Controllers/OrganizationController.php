@@ -46,7 +46,7 @@ class OrganizationController extends Controller
             return response()->json(['success' => true, 'data' => $organization], 201);
 
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error creating organization'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -67,7 +67,7 @@ class OrganizationController extends Controller
 
         } catch (Exception $e) {
 
-            return response()->json(['success' => false, 'message' => 'Error adding user to organization'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
 
         }
 

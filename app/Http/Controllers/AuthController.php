@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Exception;
 
 class AuthController extends Controller
@@ -23,11 +24,11 @@ class AuthController extends Controller
                 return response()->json(['success' => false, 'error' => 'Unauthorized'], 401);
             }
     
-            return $this->respondWithToken($shouldRespondWithToken);
+            return $this->respondWithToken($shouldRespondWithToken, auth()->user());
 
         } catch(Exception $e) {
 
-            return response()->json(['success' => false, 'message' => 'Error logging in'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -70,7 +71,7 @@ class AuthController extends Controller
 
         catch(Exception $e) {
             
-            return response()->json(['success' => false, 'message' => 'Error logging out'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
 
         }
     }
@@ -82,7 +83,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        return $this->respondWithToken(auth()->refresh(), auth()->user());
     }
 
     /**
@@ -92,14 +93,15 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondWithToken($token)
+    public function respondWithToken($token, User $user)
     {
         return response()->json([
             'success' => true,
             'data' => [
                 'access_token' => $token,
                 'token_type' => 'bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60
+                'expires_in' => auth()->factory()->getTTL() * 60,
+                'user' => $user->load('organizations'),
             ]
         ], 200);
     }

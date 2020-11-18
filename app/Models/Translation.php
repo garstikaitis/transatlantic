@@ -16,11 +16,18 @@ class Translation extends Model
         'localeId',
         'organizationId',
         'userId',
+        'projectId'
     ];
 
     public function locale() {
 
         return $this->hasOne(Locale::class, 'id', 'localeId');
+
+    }
+
+    public function project() {
+
+        return $this->hasOne(Project::class, 'id', 'projectId');
 
     }
 }

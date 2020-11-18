@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Organization;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -23,6 +24,7 @@ class User extends Authenticatable implements JWTSubject
         'lastName',
         'email',
         'password',
+        'onboardingCompleted'
     ];
 
     /**
@@ -57,6 +59,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function organizations() {
+        return $this->belongsToMany(Organization::class, 'organization_user', 'userId', 'organizationId');
     }
 
 }

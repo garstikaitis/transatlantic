@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Models\Locale;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,6 +14,7 @@ abstract class TestCase extends BaseTestCase
 
     public User $user;
     public Organization $organization;
+    public Locale $locale;
     public string $token;
 
     public function setUp(): void {
@@ -23,11 +25,19 @@ abstract class TestCase extends BaseTestCase
 
         $this->setUpOrganization();
 
+        $this->setUpLocale();
+
     }
 
     private function setUpUser() {
 
         $this->user = User::factory()->create(['email' => 'test@example.com', 'password' => 'password']);
+
+    }
+
+    private function setUpLocale() {
+
+        $this->locale = Locale::factory()->create();
 
     }
 

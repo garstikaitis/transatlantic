@@ -5,9 +5,10 @@ namespace Database\Factories;
 use App\Models\User;
 use App\Models\Model;
 use App\Models\Locale;
+use App\Models\Project;
+use App\Models\Translation;
 use Illuminate\Support\Str;
 use App\Models\Organization;
-use App\Models\Translation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TranslationFactory extends Factory
@@ -31,7 +32,8 @@ class TranslationFactory extends Factory
             'transValue' => $this->faker->text(),
             'localeId' => Locale::factory()->create()->id,
             'organizationId' => Organization::factory()->create()->id,
-            'userId' => User::factory()->create()->id
+            'userId' => User::factory()->create()->id,
+            'projectId' => Project::factory()->create()->id,
         ];
     }
 }
