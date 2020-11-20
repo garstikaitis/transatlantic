@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LocaleProject extends Model
+class OrganizationProjectKey extends Model
 {
 	use HasFactory;
 	
-	protected $table = 'locale_project';
+	protected $table = 'organization_project_key';
 
     protected $fillable = [
+		'organizationId',
 		'projectId',
-		'localeId',
-		'isMainLocale',
+		'key',
 	];
 
 }

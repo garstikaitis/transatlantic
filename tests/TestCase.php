@@ -2,10 +2,13 @@
 
 namespace Tests;
 
-use App\Models\Locale;
-use App\Models\Organization;
 use App\Models\User;
+use App\Models\Locale;
+use App\Models\Project;
+use App\Models\Organization;
+use App\Models\OrganizationProjectKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Database\Factories\OrganizationProjectKeyFactory;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -15,7 +18,8 @@ abstract class TestCase extends BaseTestCase
     public User $user;
     public Organization $organization;
     public Locale $locale;
-    public string $token;
+    public Project $project;
+    public OrganizationProjectKey $token;
 
     public function setUp(): void {
 
@@ -27,11 +31,30 @@ abstract class TestCase extends BaseTestCase
 
         $this->setUpLocale();
 
+        $this->setUpProject();
+
+        $this->setUpToken();
+
+    }
+
+    private function setUpToken() {
+
+        $this->token = OrganizationProjectKey::factory()->create([
+            'projectId' => $this->project->id,
+            'organizationId' => $this->organization->id,
+        ]);
+
     }
 
     private function setUpUser() {
 
         $this->user = User::factory()->create(['email' => 'test@example.com', 'password' => 'password']);
+
+    }
+
+    private function setUpProject() {
+
+        $this->project = Project::factory()->create();
 
     }
 

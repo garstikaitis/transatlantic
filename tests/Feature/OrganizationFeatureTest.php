@@ -5,9 +5,10 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Locale;
-use App\Models\LocaleOrganization;
+use App\Models\Project;
 use App\Models\Organization;
 use App\Models\OrganizationUser;
+use App\Models\LocaleOrganization;
 
 class OrganizationFeatureTest extends TestCase
 {
@@ -29,7 +30,7 @@ class OrganizationFeatureTest extends TestCase
 
 		$response->assertStatus(200);
 
-		$response->assertJsonCount(2, 'data');
+		$response->assertJsonCount(5, 'data');
 		
 	}
 
@@ -195,6 +196,40 @@ class OrganizationFeatureTest extends TestCase
 		$response = $this->callApiAsAuthUser('GET', '/api/organizations/12321321312');
 
 		$response->assertStatus(404);
+
+	}
+
+	public function test_user_can_create_api_key_for_organization() {
+
+		$project = Project::factory()->create();
+
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations/settings/api-keys', [
+			'organizationId' => $this->organization->id,
+			'projectId' => $project->id,
+		]);
+
+		$response->assertStatus(201);
+
+		$this->assertTrue($response['success']);
+
+		$this->assertDatabaseHas('organization_project_key', ['organizationId' => $this->organization->id, 'projectId' => $project->id]);
+
+	}
+
+	public function test_user_can_not_create_api_key_for_organization_with_wrong_input() {
+
+		$project = Project::factory()->create();
+
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations/settings/api-keys', [
+			'organizationId' => 12312312,
+			'projectId' => '12312312'
+		]);
+
+		$response->assertStatus(500);
+
+		$this->assertFalse($response['success']);
+
+		$this->assertDatabaseMissing('organization_project_key', ['organizationId' => $this->organization->id, 'projectId' => $project->id]);
 
 	}
 }

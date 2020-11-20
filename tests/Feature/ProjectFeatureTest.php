@@ -50,6 +50,7 @@ class ProjectFeatureTest extends TestCase
         $response = $this->callApiAsAuthUser('POST', '/api/projects/create', [
 			'name' => '123',
 			'organizationId' => $this->organization->id,
+			'mainLocaleId' => $this->locale->id,
 			'localeIds' => [$this->locale->id]
 		]);
 
@@ -81,6 +82,44 @@ class ProjectFeatureTest extends TestCase
 		$this->assertDatabaseMissing('projects', ['name' => '123']);
 		$this->assertDatabaseMissing('locale_project', ['localeId' => $this->locale->id]);
 		
+	}
+
+	public function test_user_can_update_project() {
+	
+		$response = $this->callApiAsAuthUser('POST', '/api/projects/update', [
+			'name' => 'new name',
+			'projectId' => $this->project->id,
+		]);
+
+		$response->assertStatus(201);
+
+		$json = $response->decodeResponseJson();
+
+		$this->assertTrue($json['success']);
+
+		$this->assertDatabaseHas('projects', ['name' => 'new name']);
+		$this->assertDatabaseMissing('projects', ['name' => $this->project->name]);
+		
+
+	}
+
+	public function test_user_can_not_update_project_with_wrong_input() {
+	
+		$response = $this->callApiAsAuthUser('POST', '/api/projects/update', [
+			'name' => 'new name',
+			'projectId' => 1231231232131,
+		]);
+
+		$response->assertStatus(500);
+
+		$json = $response->decodeResponseJson();
+
+		$this->assertFalse($json['success']);
+
+		$this->assertDatabaseMissing('projects', ['name' => 'new name']);
+		$this->assertDatabaseHas('projects', ['name' => $this->project->name]);
+		
+
 	}
 
     public function test_user_can_delete_project()

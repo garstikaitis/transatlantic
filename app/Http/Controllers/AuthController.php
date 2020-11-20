@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Exception;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -24,7 +25,7 @@ class AuthController extends Controller
                 return response()->json(['success' => false, 'error' => 'Unauthorized'], 401);
             }
     
-            return $this->respondWithToken($shouldRespondWithToken, auth()->user());
+            return $this->respondWithToken($shouldRespondWithToken);
 
         } catch(Exception $e) {
 
@@ -83,7 +84,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh(), auth()->user());
+        return $this->respondWithToken(auth()->refresh());
     }
 
     /**
@@ -93,8 +94,9 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respondWithToken($token, User $user)
+    public function respondWithToken($token)
     {
+        $user = auth()->user();
         return response()->json([
             'success' => true,
             'data' => [

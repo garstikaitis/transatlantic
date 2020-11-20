@@ -20,7 +20,7 @@ class Project extends Model
 	}
 
 	public function locales() {
-		return $this->belongsToMany(Locale::class, 'locale_project', 'projectId', 'localeId');
+		return $this->belongsToMany(Locale::class, 'locale_project', 'projectId', 'localeId')->withPivot('isMainLocale');
 	}
 
 	public function translations() {

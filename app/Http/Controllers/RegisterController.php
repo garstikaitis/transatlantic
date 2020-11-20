@@ -33,11 +33,9 @@ class RegisterController extends Controller
 			
 			$token = auth()->login($user);
     
-            return $authController->respondWithToken($token, $user);
+            return $authController->respondWithToken($token);
 
         } catch(Exception $e) {
-
-			dd($e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'Error logging in'], 500);
         }

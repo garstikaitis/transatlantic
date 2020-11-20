@@ -59,15 +59,15 @@ class TranslationController extends Controller
     public function updateTranslation() {
 
         try {
-            
             $this->validateInput(
                 request()->all(), [
-                    'translationId' => 'integer|required|exists:translations,id',
+                    'translationId' => 'integer|required',
                     'transKey' => 'string|required',
                     'transValue' => 'string|required',
                     'localeId' => 'integer|required|exists:locales,id',
                     'organizationId' => 'integer|required|exists:organizations,id',
-                    'userId' => 'required|exists:users,id'
+                    'userId' => 'required|exists:users,id',
+                    'projectId' => 'required|integer|exists:projects,id'
                 ]
             );
 
@@ -77,13 +77,15 @@ class TranslationController extends Controller
                 
             }
 
-            $translation = Translation::findOrFail(request('translationId'));
+            $translation = Translation::where('id', request('translationId'))->firstOrFail();
+            $translation->transKey = request('transKey');
+            $translation->transValue = request('transValue');
+            $translation->localeId = request('localeId');
+            $translation->organizationId = request('organizationId');
+            $translation->userId = request('userId');
+            $translation->projectId = request('projectId');
 
-            $request = request()->all();
-            $request['id'] = request('translationId');
-            unset($request['translationId']);
-
-            $translation->updateOrCreate($request);
+            $translation->save();
 
             return response()->json(['success' => true, 'data' => $translation], 200);
 

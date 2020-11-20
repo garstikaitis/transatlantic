@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Models\Locale;
-use App\Models\LocaleOrganization;
-use App\Models\Translation;
 use Tests\TestCase;
+use App\Models\Locale;
+use App\Models\Project;
+use App\Models\Translation;
+use App\Models\LocaleOrganization;
 
 class TranslationFeatureTest extends TestCase
 {
@@ -29,21 +30,24 @@ class TranslationFeatureTest extends TestCase
 			'localeId' => $locale1->id,
 			'organizationId' => $this->organization->id,
 			'userId' => $this->user->id,
+			'projectId' => $this->project->id,
 			]);
 		Translation::factory()->create([
 			'localeId' => $locale2->id,
 			'organizationId' => $this->organization->id,
 			'userId' => $this->user->id,
+			'projectId' => $this->project->id,
 		]);
 
         $response = $this->callApiAsAuthUser('POST', '/api/translations', [
 			'locales' => [$locale1->iso],
-			'organizationId' => $this->organization->id
+			'organizationId' => $this->organization->id,
+			'projectId' => $this->project->id,
 		]);
 
 		$response->assertStatus(200);
 
-		$response->assertJsonCount(1, 'data');
+		$response->assertJsonCount(2, 'data');
 
 	}
 
@@ -139,20 +143,22 @@ class TranslationFeatureTest extends TestCase
 		LocaleOrganization::factory()->create(['localeId' => $locale->id, 'organizationId' => $this->organization->id]);
 
 		$translation = Translation::factory()->create([
-			'transKey' => '123',
+			'transKey' => '1231231232131231',
 			'transValue' => 'old val',
 			'localeId' => $locale->id,
 			'organizationId' => $this->organization->id,
 			'userId' => $this->user->id,
+			'projectId' => $this->project->id,
 		]);
 
 		$response = $this->callApiAsAuthUser('POST', '/api/translations/update', [
 			'translationId' => $translation->id,
-			'transKey' => '123',
+			'transKey' => '1231231232131231',
 			'transValue' => 'new val',
 			'localeId' => $locale->id,
 			'organizationId' => $this->organization->id,
 			'userId' => $this->user->id,
+			'projectId' => $this->project->id,
 		]);
 
 		$response->assertStatus(200);
@@ -213,6 +219,7 @@ class TranslationFeatureTest extends TestCase
 			'localeId' => $locale->id,
 			'organizationId' => $this->organization->id,
 			'userId' => $this->user->id,
+			'projectId' => $this->project->id
 		]);
 
 		$response->assertStatus(500);

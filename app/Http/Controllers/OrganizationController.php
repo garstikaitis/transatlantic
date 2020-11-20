@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LocaleOrganization;
+use Exception;
 use App\Models\Organization;
 use App\Models\OrganizationUser;
-use Exception;
+use App\Models\LocaleOrganization;
+use App\Models\OrganizationProjectKey;
 
 class OrganizationController extends Controller
 {
@@ -13,6 +14,46 @@ class OrganizationController extends Controller
     {
         try {
             return response()->json(['success' => true, 'data' => Organization::all()]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error fetching locales'], 500);
+        }
+    }
+
+    public function generateApiKeyForOrganization() {
+        try {
+            $this->validateInput(request()->all(), [
+                'organizationId' => 'required|integer|exists:organizations,id',
+                'projectId' => 'required|integer|exists:projects,id',
+            ]);
+            $apiKey = implode('-', str_split(substr(strtolower(md5(microtime().rand(1000, 9999))), 0, 30), 6));
+            OrganizationProjectKey::create([
+                'organizationId' => request('organizationId'),
+                'projectId' => request('projectId'),
+                'key' => $apiKey
+            ]);
+            return response()->json(['success' => true, 'data' => $apiKey], 201);
+        } catch(Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+    
+    public function getApiKeyForOrganization() {
+        try {
+            $this->validateInput(request()->all(), [
+                'organizationId' => 'required|integer|exists:organizations,id',
+                'projectId' => 'required|integer|exists:projects,id',
+            ]);
+            $key = OrganizationProjectKey::where('organizationId', request('organizationId'))->where('projectId', request('projectId'))->first();
+            return response()->json(['success' => true, 'data' => $key], 200);
+        } catch(Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getUserOrganizations() {
+        $organizations = auth()->user()->organizations()->get();
+         try {
+            return response()->json(['success' => true, 'data' => $organizations]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error fetching locales'], 500);
         }

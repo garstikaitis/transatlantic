@@ -162,6 +162,8 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        Lanin\Laravel\ApiDebugger\ServiceProvider::class,
+
 
         /*
          * Package Service Providers...

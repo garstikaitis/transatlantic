@@ -26,15 +26,12 @@ class GetTranslations implements UseCase {
 	public function handle() {
         try {
             $this->validateInput($this->request, [
-            'locales' => 'required|array',
-            'organizationId' => 'required|integer|exists:organizations,id',
-        ]);
+            	'projectId' => 'required|integer|exists:projects,id',
+     		]);
 
-            $this->checkIfLocalesAreValid();
 
-            $this->filterResultsByOrganizationId();
+            $this->filterResultsByProjectId();
 
-			$this->filterResultsByLocale();
 			
 			$this->setResults();
 
@@ -42,35 +39,24 @@ class GetTranslations implements UseCase {
 			
         } catch (Exception $e) {
 
-			return response()->json(['success' => false, 'message' => 'Error fetching results'], 500);
+			return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
 			
         }
     }
 
-	private function checkIfLocalesAreValid() {
-
-		foreach($this->request['locales'] as $locale)
-		if(!$this->helpers->localeIsValid($locale)) abort(500, 'Locale is not valid');
-
-	}
-
-	private function filterResultsByOrganizationId() {
+	private function filterResultsByProjectId() {
 		
-		$this->query = Translation::with('locale')->where('organizationId', $this->request['organizationId']);
-
-	}
-
-	private function filterResultsByLocale() {
-
-		$this->query->whereHas('locale', function($localeQuery) {
-			return $localeQuery->whereIn('iso', $this->request['locales']);
-		});
+		$this->query = Translation::with('locale')->where('projectId', $this->request['projectId']);
 
 	}
 
 	private function setResults() {
 
-		$this->results = $this->query->get();
+		$results = $this->query->get();
+
+		$results = $results->groupBy('transKey');
+
+		$this->results = $results;
 
 	}
 }
