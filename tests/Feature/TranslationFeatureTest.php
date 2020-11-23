@@ -308,7 +308,7 @@ class TranslationFeatureTest extends TestCase
 
 		$this->assertTrue($response['success']);
 
-		$transKey = $response['data'][0]['transKey'];
+		$transKey = $response['data']['business.email.send'][0]['transKey'];
 		
 		$this->assertDatabaseHas('translations', ['transKey' => $transKey]);
 

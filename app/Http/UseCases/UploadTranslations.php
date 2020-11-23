@@ -40,10 +40,20 @@ class UploadTranslations implements UseCase
 
 			$this->saveTranslationsToDb();
 
+			$this->setResults();
+
             return response()->json(['success' => true, 'data' => $this->translations], 200);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+	}
+
+	private function setResults() {
+
+		$results = Translation::with('locale')->where('projectId', $this->request['projectId'])->get();
+
+		$this->translations = $results = $results->groupBy('transKey');
+
 	}
 
 	private function setFile() {
@@ -90,8 +100,6 @@ class UploadTranslations implements UseCase
 		$translation->organizationId = $this->request['organizationId'];
 
 		$translation->save();
-
-		$this->translations->push($translation);
 
 	}
 

@@ -5,7 +5,6 @@ namespace App\Http\UseCases;
 use Exception;
 use App\Contracts\UseCase;
 use App\Models\Translation;
-use App\Classes\LocaleHelpers;
 use App\Traits\ValidationTrait;
 
 class GetTranslations implements UseCase {
@@ -13,13 +12,11 @@ class GetTranslations implements UseCase {
 	use ValidationTrait;
 
 	private array $request;
-	private LocaleHelpers $helpers;
 	private $query;
 	
 	public function __construct(array $request)
 	{
 		$this->request = $request;
-		$this->helpers = new LocaleHelpers();
 
 	}
 
