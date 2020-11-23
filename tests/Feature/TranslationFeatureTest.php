@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Locale;
-use App\Models\Project;
 use App\Models\Translation;
+use Illuminate\Http\UploadedFile;
 use App\Models\LocaleOrganization;
 
 class TranslationFeatureTest extends TestCase
@@ -281,6 +281,64 @@ class TranslationFeatureTest extends TestCase
 		$this->assertFalse($response['success']);
 		
 		$this->assertDatabaseHas('translations', ['id' => $translation->id]);
+
+	}
+
+	public function test_user_can_upload_translations() {
+
+		Locale::factory()->create(['iso' => 'en']);
+		Locale::factory()->create(['iso' => 'lt']);
+
+		$stub = __DIR__.'/stubs/translations.json';
+
+		$name = 'translations.json';
+		$path = sys_get_temp_dir().'/'.$name;
+		
+		copy($stub, $path);
+
+		$file = new UploadedFile($path, $name, 'application/json', null, true);
+
+		$response = $this->callApiAsAuthUser('POST', '/api/translations/upload', [
+			'organizationId' => $this->organization->id,
+			'projectId' => $this->project->id,
+			'file' => $file
+		]);
+
+		$response->assertStatus(200);
+
+		$this->assertTrue($response['success']);
+
+		$transKey = $response['data'][0]['transKey'];
+		
+		$this->assertDatabaseHas('translations', ['transKey' => $transKey]);
+
+	}
+
+	public function test_user_can_not_upload_translations() {
+
+		Locale::factory()->create(['iso' => 'en']);
+		Locale::factory()->create(['iso' => 'lt']);
+
+		$stub = __DIR__.'/stubs/translations.json';
+
+		$name = 'translations.json';
+		$path = sys_get_temp_dir().'/'.$name;
+		
+		copy($stub, $path);
+
+		$file = new UploadedFile($path, $name, 'application/json', null, true);
+
+		$response = $this->callApiAsAuthUser('POST', '/api/translations/upload', [
+			'organizationId' => 12321312,
+			'projectId' => '123123123123',
+			'file' => $file
+		]);
+
+		$response->assertStatus(500);
+
+		$this->assertFalse($response['success']);
+
+		$this->assertDatabaseMissing('translations', ['transKey' => 'bye']);
 
 	}
 	

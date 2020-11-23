@@ -1,0 +1,20 @@
+{
+    "en": {
+        "business": {
+            "email": {
+                "send": "Send"
+            }
+        },
+        "hello": "Hi",
+        "bye": "Bye"
+    },
+    "lt": {
+        "business": {
+            "email": {
+                "send": "Siusti"
+            }
+        },
+        "hello": "Labas",
+        "bye": "Viso gero"
+    }
+}

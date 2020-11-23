@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Translation;
-use App\Traits\ValidationTrait;
 use App\Models\LocaleOrganization;
 use App\Http\UseCases\GetTranslations;
+use App\Http\UseCases\UploadTranslations;
 
 class TranslationController extends Controller
 {
@@ -20,6 +20,20 @@ class TranslationController extends Controller
         } catch(Exception $e) {
 
             return response()->json(['success' => false, 'message' => 'Error getting translations'], 500);
+
+        }
+
+    }
+
+    public function uploadTranslations() {
+
+        try {
+
+            return (new UploadTranslations(request()->all()))->handle();
+
+        } catch(Exception $e) {
+
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
 
         }
 

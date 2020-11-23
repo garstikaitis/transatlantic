@@ -54,6 +54,7 @@ Route::group(['middleware' => ['api', 'throttleIp']], function() {
         Route::post('/create', [TranslationController::class, 'createTranslation']);
         Route::post('/update', [TranslationController::class, 'updateTranslation']);
         Route::post('/delete', [TranslationController::class, 'deleteTranslation']);
+        Route::post('/upload', [TranslationController::class, 'uploadTranslations']);
     });
     Route::group(['prefix' => 'projects'], function() {
         Route::post('/', [ProjectController::class, 'getProjects']);
