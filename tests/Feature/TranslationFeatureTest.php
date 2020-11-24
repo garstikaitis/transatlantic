@@ -51,6 +51,46 @@ class TranslationFeatureTest extends TestCase
 
 	}
 
+    public function test_user_can_get_sorted_translations()
+    {
+
+		$locale1 = Locale::factory()->create(['iso' => 'en']);
+		$locale2 = Locale::factory()->create(['iso' => 'da']);
+		
+		Translation::factory()->create([
+			'transKey' => 'email_like_me',
+			'transValue' => 'Hello this is prison Mike',
+			'localeId' => $locale1->id,
+			'organizationId' => $this->organization->id,
+			'userId' => $this->user->id,
+			'projectId' => $this->project->id,
+		]);
+		Translation::factory()->create([
+			'transKey' => 'email_like_you',
+			'transValue' => 'Hello this this is Mike prison',
+			'localeId' => $locale2->id,
+			'organizationId' => $this->organization->id,
+			'userId' => $this->user->id,
+			'projectId' => $this->project->id,
+		]);
+		Translation::factory()->create([
+			'transKey' => 'email_like_mama',
+			'transValue' => 'Send email now',
+			'localeId' => $locale2->id,
+			'organizationId' => $this->organization->id,
+			'userId' => $this->user->id,
+			'projectId' => $this->project->id,
+		]);
+
+        $response = $this->callApiAsAuthUser('POST', '/api/translations', [
+			'projectId' => $this->project->id,
+			'searchValue' => 'Hello this is Mike'
+		]);
+
+		$response->assertStatus(200);
+
+	}
+
     public function test_user_can_not_get_translations_with_wrong_input()
     {
 
