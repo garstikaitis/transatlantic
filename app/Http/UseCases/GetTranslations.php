@@ -35,7 +35,7 @@ class GetTranslations implements UseCase {
 			
 			$this->sortResults();
 
-			$this->groupAndSetResults();
+			$this->groupResults();
 
 			return response()->json(['success' => true, 'data' => $this->results], 200);
 			
@@ -60,15 +60,15 @@ class GetTranslations implements UseCase {
 
 	private function sortResults() {
 
-		if(in_array('searchValue', $this->request)) {
-			$this->results = $this->results->map(function($translation, $index) {
+		if(isset($this->request['searchValue'])) {
+			$results = $this->results->map(function($translation, $index) {
 				$searchValue = str_replace(' ', '', strtolower($this->request['searchValue']));
 				$transValue = str_replace(' ', '', strtolower($translation->transValue));
 				$count = $this->countSubstrings($searchValue, $transValue);
 				$translation->sortingRank = $count;
 				return $translation;
 			});
-			$this->results->sortBy('sortingRank');
+			$this->results = $results->sortByDesc('sortingRank')->values();
 		}
 	}
 
@@ -87,9 +87,9 @@ class GetTranslations implements UseCase {
 
 	}
 
-	public function groupAndSetResults() {
+	public function groupResults() {
 
-		$this->results = $this->results->groupBy('transKey');
+		$this->results = $this->results->flatten()->groupBy('transKey');
 
 	}
 

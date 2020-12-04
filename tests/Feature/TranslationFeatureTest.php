@@ -287,7 +287,8 @@ class TranslationFeatureTest extends TestCase
 		]);
 
 		$response = $this->callApiAsAuthUser('POST', '/api/translations/delete', [
-			'translationId' => $translation->id,
+			'translationKeys' => [$translation->transKey],
+			'projectId' => $translation->projectId,
 		]);
 
 		$response->assertStatus(200);

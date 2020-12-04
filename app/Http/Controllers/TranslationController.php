@@ -99,7 +99,7 @@ class TranslationController extends Controller
             $translation->userId = request('userId');
             $translation->projectId = request('projectId');
 
-            $translation->save();
+            $translation->update();
 
             return response()->json(['success' => true, 'data' => $translation], 200);
 
@@ -116,15 +116,19 @@ class TranslationController extends Controller
             
             $this->validateInput(
                 request()->all(), [
-                    'translationId' => 'integer|required|exists:translations,id',
+                    'projectId' => 'integer|required|exists:projects,id',
+                    'translationKeys' => 'required|array',
                 ]
             );
 
-            $translation = Translation::findOrFail(request('translationId'));
+            foreach(request('translationKeys') as $translationKey) {
 
-            $translation = $translation->delete();
+                Translation::where('transKey', $translationKey)->delete();
 
-            return response()->json(['success' => true, 'data' => $translation], 200);
+            }
+
+            return response()->json(['success' => true, 'data' => null], 200);
+
 
         } catch (Exception $e) {
 

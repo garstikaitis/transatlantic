@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\TotalsController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TranslationController;
@@ -30,6 +31,9 @@ Route::get('/client/translations', [ClientController::class, 'getOrganizationPro
 Route::group(['middleware' => ['api', 'throttleIp']], function() {
     Route::group(['prefix' => 'auth'], function() {
         Route::post('me', [AuthController::class, 'me']);
+    });
+    Route::group(['prefix' => 'totals'], function() {
+        Route::get('/', [TotalsController::class, 'getDashboardTotals']);
     });
     Route::group(['prefix' => 'users'], function() {
         Route::post('update', [UserController::class, 'updateUser']);

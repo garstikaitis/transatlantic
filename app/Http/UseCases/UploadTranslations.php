@@ -65,14 +65,17 @@ class UploadTranslations implements UseCase
 	private function saveTranslationsToDb() {
 
 		foreach($this->fileContents as $locale => $fileContent) {
-			
+
 			$this->tempKey = '';
-			
+
 			foreach($fileContent as $key => $content) {
+
+
 				
 				$this->tempKey = $key;
 
 				$trans = new stdClass();
+
 
 				if(is_object($content)) {
 					$trans = $this->recursivelyBuildTranslationObject($content);
@@ -121,6 +124,8 @@ class UploadTranslations implements UseCase
 
 		$json = file_get_contents($this->file);
 		$this->fileContents = json_decode($json);
+			lad($this->fileContents);
+
 
 	}
 	
