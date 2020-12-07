@@ -328,7 +328,7 @@ class TranslationFeatureTest extends TestCase
 	public function test_user_can_upload_translations() {
 
 		Locale::factory()->create(['iso' => 'en']);
-		Locale::factory()->create(['iso' => 'lt']);
+		Locale::factory()->create(['iso' => 'da']);
 
 		$stub = __DIR__.'/stubs/translations.json';
 
@@ -349,7 +349,7 @@ class TranslationFeatureTest extends TestCase
 
 		$this->assertTrue($response['success']);
 
-		$transKey = $response['data']['business.email.send'][0]['transKey'];
+		$transKey = $response['data']['auth.already_have_account'][0]['transKey'];
 		
 		$this->assertDatabaseHas('translations', ['transKey' => $transKey]);
 
@@ -358,7 +358,7 @@ class TranslationFeatureTest extends TestCase
 	public function test_user_can_not_upload_translations() {
 
 		Locale::factory()->create(['iso' => 'en']);
-		Locale::factory()->create(['iso' => 'lt']);
+		Locale::factory()->create(['iso' => 'da']);
 
 		$stub = __DIR__.'/stubs/translations.json';
 

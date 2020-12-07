@@ -6,6 +6,7 @@ use Exception;
 use App\Contracts\UseCase;
 use App\Models\Translation;
 use App\Traits\ValidationTrait;
+use Illuminate\Pagination\Paginator;
 
 class GetTranslations implements UseCase {
 
@@ -26,15 +27,17 @@ class GetTranslations implements UseCase {
             $this->validateInput($this->request, [
 				'projectId' => 'required|integer|exists:projects,id',
 				'searchValue' => 'nullable|string',
+				'page' => 'required|integer'
      		]);
-
 
 			$this->filterResultsByProjectId();
 
 			$this->setResults();
+
+			$this->paginateResults();
 			
 			$this->sortResults();
-
+			
 			$this->groupResults();
 
 			return response()->json(['success' => true, 'data' => $this->results], 200);
@@ -52,23 +55,31 @@ class GetTranslations implements UseCase {
 
 	}
 
+	private function paginateResults() {
+
+		$paginator = new Paginator($this->results, 50, $this->request['page']);
+
+		$this->results = $paginator;
+
+	}
+
 	private function setResults() {
 
-		$this->results = $this->query->get();
+		$this->results = $this->query->paginate();
 
 	}
 
 	private function sortResults() {
 
 		if(isset($this->request['searchValue'])) {
-			$results = $this->results->map(function($translation, $index) {
+			$results = $this->results['data']->map(function($translation, $index) {
 				$searchValue = str_replace(' ', '', strtolower($this->request['searchValue']));
 				$transValue = str_replace(' ', '', strtolower($translation->transValue));
 				$count = $this->countSubstrings($searchValue, $transValue);
 				$translation->sortingRank = $count;
 				return $translation;
 			});
-			$this->results = $results->sortByDesc('sortingRank')->values();
+			$this->results['data'] = $results->sortByDesc('sortingRank')->values();
 		}
 	}
 
@@ -89,8 +100,18 @@ class GetTranslations implements UseCase {
 
 	public function groupResults() {
 
-		$this->results = $this->results->flatten()->groupBy('transKey');
+		$results = $this->results['data'];
+
+		$grouped = collect($results)->groupBy('transKey');
+
+		$this->results['data'] = $grouped;
 
 	}
+
+	// public function paginateResults() {
+
+	// 	lad($this->results);
+
+	// }
 
 }

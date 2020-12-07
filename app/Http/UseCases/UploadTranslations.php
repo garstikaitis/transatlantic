@@ -78,14 +78,14 @@ class UploadTranslations implements UseCase
 
 
 				if(is_object($content)) {
-					$trans = $this->recursivelyBuildTranslationObject($content);
+					$trans = $this->recursivelyBuildTranslationObject($content, $locale, $this->tempKey);
 				} else {
 					$trans->transKey = $key;
 					$trans->transValue = $content;
+					$this->saveTranslation($locale, $trans);
 				}
 
-				$this->saveTranslation($locale, $trans);
-
+				
 			}
 		}
 
@@ -106,15 +106,18 @@ class UploadTranslations implements UseCase
 
 	}
 
-	private function recursivelyBuildTranslationObject($transValue) {
+	private function recursivelyBuildTranslationObject($transValue, $locale, $parentKey) {
 		$returnValue = new stdClass();
 		foreach($transValue as $key => $value) {
 			$this->tempKey = $this->tempKey . '.' . $key;
 			if(!is_string($value)) {
-				$returnValue = $this->recursivelyBuildTranslationObject($value);
+				$returnValue = $this->recursivelyBuildTranslationObject($value, $locale, $parentKey);
 			} else {
-				$returnValue->transKey = $this->tempKey;
+				$key = $this->tempKey;
+				$returnValue->transKey = $key;
 				$returnValue->transValue = $value;
+				$this->saveTranslation($locale, $returnValue);
+				$this->tempKey = $parentKey;
 			}
 		}
 		return $returnValue;
@@ -124,8 +127,6 @@ class UploadTranslations implements UseCase
 
 		$json = file_get_contents($this->file);
 		$this->fileContents = json_decode($json);
-			lad($this->fileContents);
-
 
 	}
 	
