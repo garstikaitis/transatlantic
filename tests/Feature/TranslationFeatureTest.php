@@ -26,13 +26,13 @@ class TranslationFeatureTest extends TestCase
 		$locale2 = Locale::factory()->create(['iso' => 'da']);
 
 		
-		Translation::factory()->create([
+		Translation::factory()->count(80)->create([
 			'localeId' => $locale1->id,
 			'organizationId' => $this->organization->id,
 			'userId' => $this->user->id,
 			'projectId' => $this->project->id,
 			]);
-		Translation::factory()->create([
+		Translation::factory()->count(100)->create([
 			'localeId' => $locale2->id,
 			'organizationId' => $this->organization->id,
 			'userId' => $this->user->id,
@@ -43,11 +43,12 @@ class TranslationFeatureTest extends TestCase
 			'locales' => [$locale1->iso],
 			'organizationId' => $this->organization->id,
 			'projectId' => $this->project->id,
+			'page' => 1,
 		]);
 
 		$response->assertStatus(200);
 
-		$response->assertJsonCount(2, 'data');
+		$response->assertJsonCount(50, 'data.results');
 
 	}
 

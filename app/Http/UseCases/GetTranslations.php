@@ -15,6 +15,8 @@ class GetTranslations implements UseCase {
 	private array $request;
 	private $query;
 	
+	const TRANSLATIONS_PER_PAGE = 50;
+
 	public function __construct(array $request)
 	{
 
@@ -32,7 +34,11 @@ class GetTranslations implements UseCase {
 
 			$this->filterResultsByProjectId();
 
+			$this->paginateResults();
+
 			$this->setResults();
+
+			$this->setPaginationObject();
 
 			$this->paginateResults();
 			
@@ -40,7 +46,9 @@ class GetTranslations implements UseCase {
 			
 			$this->groupResults();
 
-			return response()->json(['success' => true, 'data' => $this->results], 200);
+			$this->paginateResults();
+
+			return response()->json(['success' => true, 'data' => ['results' => $this->results, 'pagination' => $this->pagination]], 200);
 			
         } catch (Exception $e) {
 
@@ -51,21 +59,28 @@ class GetTranslations implements UseCase {
 
 	private function filterResultsByProjectId() {
 		
-		$this->query = Translation::with('locale')->where('projectId', $this->request['projectId']);
+		$this->resultsQuery = Translation::with('locale')->where('projectId', $this->request['projectId']);
 
 	}
 
 	private function paginateResults() {
 
-		$paginator = new Paginator($this->results, 50, $this->request['page']);
+		$this->query = $this->resultsQuery->skip($this->request['page'] - 1 * self::TRANSLATIONS_PER_PAGE)->take(self::TRANSLATIONS_PER_PAGE);
 
-		$this->results = $paginator;
+	}
+
+	private function setPaginationObject() {
+
+		$this->pagination = [
+			'currentPage' => $this->request['page'],
+			'totalPages' => intval(ceil($this->resultsQuery->count() / self::TRANSLATIONS_PER_PAGE)),
+		];
 
 	}
 
 	private function setResults() {
 
-		$this->results = $this->query->paginate();
+		$this->results = $this->query->get();
 
 	}
 
@@ -100,18 +115,8 @@ class GetTranslations implements UseCase {
 
 	public function groupResults() {
 
-		$results = $this->results['data'];
-
-		$grouped = collect($results)->groupBy('transKey');
-
-		$this->results['data'] = $grouped;
+		$this->results = $this->results->groupBy('transKey');
 
 	}
-
-	// public function paginateResults() {
-
-	// 	lad($this->results);
-
-	// }
 
 }
