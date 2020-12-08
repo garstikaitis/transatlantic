@@ -40,13 +40,9 @@ class GetTranslations implements UseCase {
 
 			$this->setPaginationObject();
 
-			$this->paginateResults();
-			
 			$this->sortResults();
 			
 			$this->groupResults();
-
-			$this->paginateResults();
 
 			return response()->json(['success' => true, 'data' => ['results' => $this->results, 'pagination' => $this->pagination]], 200);
 			
@@ -71,9 +67,12 @@ class GetTranslations implements UseCase {
 
 	private function setPaginationObject() {
 
+		$count = $this->resultsQuery->count();
+
 		$this->pagination = [
 			'currentPage' => $this->request['page'],
-			'totalPages' => intval(ceil($this->resultsQuery->count() / self::TRANSLATIONS_PER_PAGE)),
+			'totalResults' => $count,
+			'totalPages' => intval(ceil($count / self::TRANSLATIONS_PER_PAGE)),
 		];
 
 	}
