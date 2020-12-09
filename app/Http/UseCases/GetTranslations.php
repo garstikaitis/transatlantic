@@ -6,6 +6,7 @@ use Exception;
 use App\Contracts\UseCase;
 use App\Models\Translation;
 use App\Traits\ValidationTrait;
+use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 
 class GetTranslations implements UseCase {
@@ -61,13 +62,15 @@ class GetTranslations implements UseCase {
 
 	private function paginateResults() {
 
-		$this->query = $this->resultsQuery->skip($this->request['page'] - 1 * self::TRANSLATIONS_PER_PAGE)->take(self::TRANSLATIONS_PER_PAGE);
+		$skip = ($this->request['page'] - 1) * self::TRANSLATIONS_PER_PAGE;
+
+		$this->query = $this->resultsQuery->skip($skip)->take(self::TRANSLATIONS_PER_PAGE);
 
 	}
 
 	private function setPaginationObject() {
 
-		$count = $this->resultsQuery->count();
+		$count = Translation::with('locale')->where('projectId', $this->request['projectId'])->count();
 
 		$this->pagination = [
 			'currentPage' => $this->request['page'],
@@ -86,15 +89,23 @@ class GetTranslations implements UseCase {
 	private function sortResults() {
 
 		if(isset($this->request['searchValue'])) {
-			$results = $this->results['data']->map(function($translation, $index) {
+			$translations = Translation::with('locale')->where('projectId', $this->request['projectId'])->get();
+			$results = $translations->map(function($translation, $index) {
 				$searchValue = str_replace(' ', '', strtolower($this->request['searchValue']));
 				$transValue = str_replace(' ', '', strtolower($translation->transValue));
-				$count = $this->countSubstrings($searchValue, $transValue);
-				$translation->sortingRank = $count;
+				$transKey = str_replace(' ', '', strtolower($translation->transkey));
+				$countValues = $this->countSubstrings($searchValue, $transValue);
+				$countKeys = $this->countSubstrings($searchValue, $transKey);
+				$translation->sortingRank = $countValues + $countKeys;
 				return $translation;
 			});
-			$this->results['data'] = $results->sortByDesc('sortingRank')->values();
+			$results = $results->sortByDesc('sortingRank');
+			$this->results = $this->paginateCollection($results);
 		}
+	}
+
+	private function paginateCollection(Collection $collection) {
+		return $collection->take(self::TRANSLATIONS_PER_PAGE);
 	}
 
 	private function countSubstrings($searchValue, $transValue) {

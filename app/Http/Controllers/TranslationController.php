@@ -70,6 +70,25 @@ class TranslationController extends Controller
 
     }
 
+    public function getAllTranslations() {
+        try {
+    
+            $this->validateInput(
+                request()->all(), [
+                    'projectId' => 'required|integer|exists:projects,id'
+                ]
+            );
+
+            $results = Translation::with('locale')->where('projectId', request('projectId'))->get();
+
+            return response()->json(['success' => true, 'data' => $results], 200);
+    
+        } catch(Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+
     public function updateTranslation() {
 
         try {

@@ -43,7 +43,7 @@ class TranslationFeatureTest extends TestCase
 			'locales' => [$locale1->iso],
 			'organizationId' => $this->organization->id,
 			'projectId' => $this->project->id,
-			'page' => 1,
+			'page' => 3,
 		]);
 
 		$response->assertStatus(200);
