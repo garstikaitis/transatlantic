@@ -9,6 +9,7 @@ use App\Contracts\UseCase;
 use App\Models\Translation;
 use App\Traits\ValidationTrait;
 use Illuminate\Support\Collection;
+use MAChitgarha\Component\JSON;
 
 class UploadTranslations implements UseCase
 {
@@ -18,6 +19,7 @@ class UploadTranslations implements UseCase
 	private object $fileContents;
 	public $tempKey;
 	private Collection $translations;
+	private array $allKeys;
     
     public function __construct(array $request)
     {
@@ -44,6 +46,7 @@ class UploadTranslations implements UseCase
 
             return response()->json(['success' => true, 'data' => $this->translations], 200);
         } catch (Exception $e) {
+			dd($e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 	}
@@ -64,25 +67,25 @@ class UploadTranslations implements UseCase
 
 	private function saveTranslationsToDb() {
 
-		foreach($this->fileContents as $locale => $fileContent) {
+		foreach($this->fileContents->get() as $locale => $fileContent) {
 
 			$this->tempKey = '';
 
 			foreach($fileContent as $key => $content) {
 
 
-				
 				$this->tempKey = $key;
 
 				$trans = new stdClass();
 
+				if(is_array($content)) {
 
-				if(is_object($content)) {
 					$trans = $this->recursivelyBuildTranslationObject($content, $locale, $this->tempKey);
 				} else {
 					$trans->transKey = $key;
 					$trans->transValue = $content;
 					$this->saveTranslation($locale, $trans);
+
 				}
 
 				
@@ -109,9 +112,10 @@ class UploadTranslations implements UseCase
 	private function recursivelyBuildTranslationObject($transValue, $locale, $parentKey) {
 		$returnValue = new stdClass();
 		foreach($transValue as $key => $value) {
-			$this->tempKey = $this->tempKey . '.' . $key;
+			$this->tempKey = $parentKey . '.' . $key;
 			if(!is_string($value)) {
-				$returnValue = $this->recursivelyBuildTranslationObject($value, $locale, $parentKey);
+				$finalKey = $parentKey . '.' . $key;
+				$returnValue = $this->recursivelyBuildTranslationObject($value, $locale, $finalKey);
 			} else {
 				$key = $this->tempKey;
 				$returnValue->transKey = $key;
@@ -125,8 +129,10 @@ class UploadTranslations implements UseCase
 
 	private function getFileContents() {
 
-		$json = file_get_contents($this->file);
-		$this->fileContents = json_decode($json);
+
+		$translations = new JSON(file_get_contents($this->file));
+
+		$this->fileContents = $translations;
 
 	}
 	

@@ -52,6 +52,9 @@ class OrganizationController extends Controller
 
     public function getUserOrganizations() {
         $organizations = auth()->user()->organizations()->get();
+        if(auth()->user()->isSuperAdmin()) {
+            $organizations = Organization::all();
+        }
          try {
             return response()->json(['success' => true, 'data' => $organizations]);
         } catch (Exception $e) {
@@ -78,11 +81,53 @@ class OrganizationController extends Controller
             $this->validateInput(
                 request()->all(), [
                     'name' => 'string|required',
-                    'subdomain' => 'string|required'
+                    'subdomain' => 'string|required',
                 ]
             );
 
-            $organization = Organization::create(request()->all());
+            $request = request()->all();
+            unset($request['logo']);
+
+            $organization = Organization::create($request);
+
+            if(request('logo') !== 'null') {
+                $result = request()->file('logo')->storeOnCloudinaryAs('prod/' . $organization->id, 'logo');
+                
+                $organization->logo = $result->getSecurePath();
+                $organization->save();
+            }
+
+
+            return response()->json(['success' => true, 'data' => $organization], 201);
+
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function editOrganization()
+    {
+        try {
+            
+            $this->validateInput(
+                request()->all(), [
+                    'organizationId' => 'required|integer|exists:organizations,id',
+                    'name' => 'string|required',
+                    'subdomain' => 'string|required',
+                ]
+            );
+
+            $organization = Organization::findOrFail(request('organizationId'));
+            $organization->name = request('name');
+            $organization->subdomain = request('subdomain');
+            $organization->save();
+
+            if(request('newLogo') !== 'null') {
+                $result = request()->file('newLogo')->storeOnCloudinaryAs('prod/' . $organization->id, 'logo');
+    
+                $organization->logo = $result->getSecurePath();
+                $organization->save();
+            }
 
             return response()->json(['success' => true, 'data' => $organization], 201);
 

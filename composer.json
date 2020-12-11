@@ -9,12 +9,14 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "cloudinary-labs/cloudinary-laravel": "^1.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "lanin/laravel-api-debugger": "^4.0",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
+        "machitgarha/json": "^1.0",
         "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {

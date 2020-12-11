@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Constants\UserRoleConstants;
 use App\Models\Organization;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
@@ -24,7 +25,9 @@ class User extends Authenticatable implements JWTSubject
         'lastName',
         'email',
         'password',
-        'onboardingCompleted'
+        'onboardingCompleted',
+        'role',
+        'image'
     ];
 
     /**
@@ -49,6 +52,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTIdentifier()
     {
         return $this->getKey();
+    }
+
+    public function isSuperAdmin() {
+        return $this->role === UserRoleConstants::SUPERADMIN;
     }
 
     /**

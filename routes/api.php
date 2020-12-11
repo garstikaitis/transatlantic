@@ -46,6 +46,7 @@ Route::group(['middleware' => ['api', 'throttleIp']], function() {
         Route::get('/user', [OrganizationController::class, 'getUserOrganizations']);
         Route::get('/{id}', [OrganizationController::class, 'getOrganizationById']);
         Route::post('/', [OrganizationController::class, 'createOrganization']);
+        Route::post('/edit/{id}', [OrganizationController::class, 'editOrganization']);
         Route::post('/user', [OrganizationController::class, 'addUserToOrganization']);
         Route::post('/user/delete', [OrganizationController::class, 'removeUserFromOrganization']);
         Route::post('/locale', [OrganizationController::class, 'addLocaleToOrganization']);

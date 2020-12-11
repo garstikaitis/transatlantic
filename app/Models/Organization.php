@@ -13,6 +13,7 @@ class Organization extends Model
     protected $fillable = [
         'name',
         'subdomain',
+        'logo'
     ];
 
     public function locales() {

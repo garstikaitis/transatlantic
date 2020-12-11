@@ -14,14 +14,32 @@ class UserController extends Controller
                 'userId' => 'required|integer|exists:users,id',
                 'firstName' => 'required|string',
                 'lastName' => 'required|string',
-                'onboardingCompleted' => 'required|boolean',
+                'onboardingCompleted' => 'required|string',
+                'role' => 'required|string',
             ]);
+
+            $onboardingCompleted = request('onboardingCompleted');
+            if($onboardingCompleted === 'true') {
+                $onboardingCompleted = true;
+            } else {
+                $onboardingCompleted = false;
+            }
 
             $user = User::findOrFail(request('userId'));
             $user->firstName = request('firstName');
             $user->lastName = request('lastName');
-            $user->onboardingCompleted = request('onboardingCompleted');
+            $user->email = request('email');
+
+            $user->onboardingCompleted = $onboardingCompleted;
+            $user->role = request('role');
             $user->save();
+
+            if(request('newLogo') !== 'null') {
+                $result = request()->file('newLogo')->storeOnCloudinaryAs('prod/' . request('userId'), 'image');
+    
+                $user->image = $result->getSecurePath();
+                $user->save();
+            }
 
             return response()->json(['success' => true, 'data' => $user], 200);
 
