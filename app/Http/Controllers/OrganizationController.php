@@ -51,11 +51,11 @@ class OrganizationController extends Controller
     }
 
     public function getUserOrganizations() {
-        $organizations = auth()->user()->organizations()->get();
-        if(auth()->user()->isSuperAdmin()) {
-            $organizations = Organization::all();
-        }
-         try {
+        try {
+            $organizations = auth()->user()->organizations()->get();
+            if(auth()->user()->isSuperAdmin()) {
+                $organizations = Organization::all();
+            }
             return response()->json(['success' => true, 'data' => $organizations]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error fetching locales'], 500);

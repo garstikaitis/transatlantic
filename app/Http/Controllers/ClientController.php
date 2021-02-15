@@ -17,14 +17,14 @@ class ClientController extends Controller
         try {
 
 			$this->validateInput(request()->all(), [
-				'organizationId' => 'required|integer|exists:organizations,id',
-				'projectId' => 'required|integer|exists:projects,id',
-				'token' => 'required|string',
+				'o' => 'required|integer|exists:organizations,id', // organizationId
+				'p' => 'required|integer|exists:projects,id', // projectId
+				't' => 'required|string', // token
 			]);
 
 			$this->validateToken();
 
-			$translations = Translation::with('locale')->where('projectId', request('projectId'))->get();
+			$translations = Translation::with('locale')->where('projectId', request('p'))->get();
 
 			$translations = (new SerializeTranslations($translations))->handle();
 

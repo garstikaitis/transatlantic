@@ -17,9 +17,11 @@ class TotalsController extends Controller
 				'organizationId' => 'required|integer|exists:organizations,id'
 			]);
 
-			$totalTranslationsCount = Translation::where('organizationId', request('organizationId'))->count();
+            $totalTranslationsCount = Translation::where('organizationId', request('organizationId'))->count();
+            
+            $payment = (new PaymentController())->getPaymentAmount();
 
-            return response()->json(['success' => true, 'data' => ['total_translations' => $totalTranslationsCount]]);
+            return response()->json(['success' => true, 'data' => ['total_translations' => $totalTranslationsCount, 'payment' => $payment]]);
 
         } catch(Exception $e) {
 

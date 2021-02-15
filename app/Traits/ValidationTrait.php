@@ -19,10 +19,9 @@ trait ValidationTrait {
 	
 	public function validateToken() {
 
-		$token = request('token');
-		lad(request('organizationId'), request('projectId'), $token);
-		$key = OrganizationProjectKey::where('organizationId', request('organizationId'))
-			->where('projectId', request('projectId'))
+		$token = request('t');
+		$key = OrganizationProjectKey::where('organizationId', request('o'))
+			->where('projectId', request('p'))
 			->where('key', $token)
 			->first();
 		if(!$key) {
