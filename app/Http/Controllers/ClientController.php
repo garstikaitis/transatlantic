@@ -28,7 +28,7 @@ class ClientController extends Controller
 
 			$translations = (new SerializeTranslations($translations))->handle();
 
-            return response()->json(['success' => true, 'data' => $translations]);
+            return response()->json($translations);
 
         } catch(Exception $e) {
 
