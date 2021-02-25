@@ -93,13 +93,13 @@ class GetTranslations implements UseCase {
 			$results = $translations->map(function($translation, $index) {
 				$searchValue = str_replace(' ', '', strtolower($this->request['searchValue']));
 				$transValue = str_replace(' ', '', strtolower($translation->transValue));
-				$transKey = str_replace(' ', '', strtolower($translation->transkey));
+				$transKey = str_replace(' ', '', strtolower($translation->transKey));
 				$countValues = $this->countSubstrings($searchValue, $transValue);
 				$countKeys = $this->countSubstrings($searchValue, $transKey);
-				$translation->sortingRank = $countValues + $countKeys;
+				$translation->sortingRank = $countKeys + $countValues;
 				return $translation;
 			});
-			$results = $results->sortByDesc('sortingRank');
+			$results = $results->sortBy('sortingRank', SORT_REGULAR, true);
 			$this->results = $this->paginateCollection($results);
 		}
 	}
