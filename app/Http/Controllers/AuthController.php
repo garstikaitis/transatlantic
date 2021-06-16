@@ -41,7 +41,6 @@ class AuthController extends Controller
     public function me()
     {
         try {
-
             return response()->json([
                 'success' => true, 
                 'data' => auth()->user()

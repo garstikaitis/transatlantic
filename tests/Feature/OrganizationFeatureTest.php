@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\InvitationStatusEnum;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Locale;
+use App\Enums\RoleEnum;
 use App\Models\Project;
 use App\Models\Organization;
 use App\Models\OrganizationUser;
@@ -37,8 +39,7 @@ class OrganizationFeatureTest extends TestCase
     public function test_user_can_create_organization()
     {
 
-        $response = $this->callApiAsAuthUser('POST', '/api/organizations', ['name' => 'Test', 'subdomain' => 'test']);
-
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations', ['name' => 'Test', 'subdomain' => 'test', 'logo' => 'null']);
 		$response->assertStatus(201);
 
 		$this->assertTrue($response['success']);
@@ -231,5 +232,31 @@ class OrganizationFeatureTest extends TestCase
 
 		$this->assertDatabaseMissing('organization_project_key', ['organizationId' => $this->organization->id, 'projectId' => $project->id]);
 
+	}
+
+	public function test_user_can_invite_user_to_org()
+	{
+
+		$response = $this->callApiAsAuthUser('POST', '/api/organizations/invite', [
+			'organizationId' => $this->organization->id,
+			'email' => '123@gmail.com',
+			'firstName' => 'Adam',
+			'lastName' => 'Dadam',
+			'role' => RoleEnum::EDITOR
+		]);
+
+		$response->assertStatus(201);
+
+		$user = $response['data'];
+
+		$this->assertTrue($response['success']);
+
+		$this->assertDatabaseHas('users', ['id' => $user['id']]);
+		$this->assertDatabaseHas('organization_user', [
+			'userId' => $user['id'],
+			'organizationId' => $this->organization->id,
+			'role' => RoleEnum::EDITOR,
+			'invitation_status' => InvitationStatusEnum::PENDING
+		]);
 	}
 }

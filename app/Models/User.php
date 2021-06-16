@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Constants\UserRoleConstants;
+use App\Enums\RoleEnum;
 use App\Models\Organization;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
@@ -55,7 +56,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function isSuperAdmin() {
-        return $this->role === UserRoleConstants::SUPERADMIN;
+        return $this->role === RoleEnum::SUPERADMIN;
     }
 
     /**

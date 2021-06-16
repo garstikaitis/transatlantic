@@ -19,6 +19,10 @@ class Organization extends Model
     public function locales() {
 
         return $this->hasMany(Locale::class, 'id', 'localeId');
-        
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'organization_user', 'organizationId', 'userId')->withPivot('role', 'invitation_status');
     }
 }

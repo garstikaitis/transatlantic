@@ -85,7 +85,8 @@ class TranslationFeatureTest extends TestCase
 
         $response = $this->callApiAsAuthUser('POST', '/api/translations', [
 			'projectId' => $this->project->id,
-			'searchValue' => 'Hello this is Mike'
+			'searchValue' => 'Hello this is Mike',
+			'page' => 1
 		]);
 
 		$response->assertStatus(200);
@@ -350,7 +351,7 @@ class TranslationFeatureTest extends TestCase
 
 		$this->assertTrue($response['success']);
 
-		$transKey = $response['data']['auth.already_have_account'][0]['transKey'];
+		$transKey = $response['data']['business.analyze.advanced_segmentation_bar'][0]['transKey'];
 		
 		$this->assertDatabaseHas('translations', ['transKey' => $transKey]);
 

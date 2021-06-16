@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InvitationStatusEnum;
+use App\Enums\RoleEnum;
 use Exception;
+use App\Models\User;
 use App\Models\Organization;
 use App\Models\OrganizationUser;
 use App\Models\LocaleOrganization;
@@ -67,9 +70,9 @@ class OrganizationController extends Controller
         $organization = Organization::findOrFail($id);
 
         try {
-            return response()->json(['success' => true, 'data' => $organization->load('locales')]);
+            return response()->json(['success' => true, 'data' => $organization->load(['locales', 'users'])]);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error fetching organization'], 500);
+            return response()->json(['success' => false, 'message' => 'Error fetching organization', 'message' => $e->getMessage()], 500);
         }
 
     }
@@ -157,6 +160,39 @@ class OrganizationController extends Controller
 
         }
 
+    }
+
+    public function inviteUserToOrganization()
+    {
+        try {
+            $this->validateInput(
+                request()->all(),
+                [
+                    'email' => 'string|required',
+                    'firstName' => 'string|required',
+                    'lastName' => 'string|required',
+                    'role' => 'string|in:' . RoleEnum::enumsToString(),
+                    'organizationId' => 'integer|required|exists:organizations,id'
+                ]
+            );
+            $user = User::create([
+                'email' => request('email'),
+                'password' => '123',
+                'firstName' => request('firstName'),
+                'lastName' => request('lastName'),
+                'onboardinCompleted' => true,
+                'role' => request('role')
+            ]);
+            OrganizationUser::create([
+                'userId' => $user->id,
+                'organizationId' => request('organizationId'),
+                'role' => request('role'),
+                'invitation_status' => InvitationStatusEnum::PENDING
+            ]);
+            return response()->json(['success' => true, 'data' => $user], 201);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function removeUserFromOrganization() {

@@ -24,9 +24,9 @@ class ClientFeatureTest extends TestCase
 		$this->createMockedTranslations();
 
         $response = $this->json('GET', '/api/client/translations', [
-			'organizationId' => $this->organization->id,
-			'projectId' => $this->project->id,
-			'token' => $this->token->key,
+			'o' => $this->organization->id,
+			'p' => $this->project->id,
+			't' => $this->token->key,
 		]);
 
 		$response->assertStatus(200);
@@ -37,9 +37,9 @@ class ClientFeatureTest extends TestCase
     {
 
         $response = $this->json('GET', '/api/client/translations', [
-			'organizationId' => '123',
-			'projectId' => 21312321,
-			'token' => $this->token->key,
+			'o' => '123',
+			'p' => 21312321,
+			't' => $this->token->key,
 		]);
 
 		$response->assertStatus(500);
@@ -50,9 +50,9 @@ class ClientFeatureTest extends TestCase
     {
 
         $response = $this->json('GET', '/api/client/translations', [
-			'organizationId' => $this->organization->id,
-			'projectId' => $this->project->id,
-			'token' => '12312312321',
+			'o' => $this->organization->id,
+			'p' => $this->project->id,
+			't' => '12312312321',
 		]);
 
 		$response->assertStatus(500);

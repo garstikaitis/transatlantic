@@ -45,8 +45,7 @@ class UploadTranslations implements UseCase
 			$this->setResults();
 
             return response()->json(['success' => true, 'data' => $this->translations], 200);
-        } catch (Exception $e) {
-			dd($e->getMessage());
+		} catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 	}

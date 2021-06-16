@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\RoleEnum;
 use App\Models\Locale;
 use Tests\TestCase;
 
@@ -24,10 +25,13 @@ class UserFeatureTest extends TestCase
 			'firstName' => 'John',
 			'lastName' => 'Travolta',
 			'onboardingCompleted' => false,
-			'email' => '123@gmail.com'
+			'email' => '123@gmail.com',
+			'role' => RoleEnum::VIEWER,
+			'newLogo' => 'null'
 		]);
 
 		$response->assertStatus(200);
+
 
 		$this->assertDatabaseHas('users', ['id' => $this->user->id, 'firstName' => 'John']);
 

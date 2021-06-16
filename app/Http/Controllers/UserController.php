@@ -14,7 +14,7 @@ class UserController extends Controller
                 'userId' => 'required|integer|exists:users,id',
                 'firstName' => 'required|string',
                 'lastName' => 'required|string',
-                'onboardingCompleted' => 'required|string',
+                'onboardingCompleted' => 'required|boolean',
                 'role' => 'required|string',
             ]);
 
